@@ -86,7 +86,7 @@ public class DataController {
     @GetMapping(value = "/status-counter", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public String statusCounter(Model model) {
         model.addAttribute("scoreCounters", new ReactiveDataDriverContextVariable(scoreStatus, 1));
-        return "status :: #counter";
+        return "status :: #score";
     }
 
     @EqualsAndHashCode

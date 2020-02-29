@@ -14,17 +14,18 @@
         this.start = function () {
 
             console.log('asdad');
-            let scoreElement = document.getElementById('score');
+
             let sourceUrl = [[@{/status-counter}]];
             console.log(sourceUrl);
 
             this.source = new EventSource(sourceUrl);
 
             this.source.addEventListener('message', function (event) {
+                let scoreElement = document.getElementById('score');
                 // This is just HTML, so no need to do anything else
-                scoreElement.innerHTML = event.data;
-                console.log('received something');
                 console.log(event.data);
+                console.log('received something');
+                scoreElement.innerHTML = event.data;
             });
 
             this.source.onerror = function () {
@@ -38,7 +39,7 @@
         };
     };
 
-    const statusObserver = new StatusObserver();
+    const statusObserver = new StatusObserver().start();
 
     window.onload = function () {
         console.log('onload');
@@ -48,7 +49,6 @@
     window.onbeforeunload = function () {
         statusObserver.stop();
     };
-
 </script>
 <body>
 <div id="score">
