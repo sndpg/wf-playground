@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>wf status</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<script data-th-inline="javascript">
+
+    function StatusObserver() {
+        console.log('I\'m here');
+
+        this.source = null;
+
+        this.start = function () {
+
+            console.log('asdad');
+            let scoreElement = document.getElementById('score');
+            let sourceUrl = [[@{/status-counter}]];
+            console.log(sourceUrl);
+
+            this.source = new EventSource(sourceUrl);
+
+            this.source.addEventListener('message', function (event) {
+                // This is just HTML, so no need to do anything else
+                scoreElement.innerHTML = event.data;
+                console.log('received something');
+                console.log(event.data);
+            });
+
+            this.source.onerror = function () {
+                this.close();
+            };
+
+        }
+
+        this.stop = function () {
+            this.source.close();
+        };
+    };
+
+    const statusObserver = new StatusObserver();
+
+    window.onload = function () {
+        console.log('onload');
+        statusObserver.start();
+    };
+
+    window.onbeforeunload = function () {
+        statusObserver.stop();
+    };
+
+</script>
+<body>
+<div id="score">
+    <!--/*@thymesVar id="scoreCounters" type="io.sykq.wfplayground.controller.DataController.ScoreCounter"*/-->
+    <div data-th-each="scoreCounter : ${scoreCounters}">
+        <!--/*@thymesVar id="scoreCounter" type="io.sykq.wfplayground.controller.DataController.ScoreCounter"*/-->
+        <p>[[${scoreCounter.getHighScores()}]]</p>
+        <p>[[${scoreCounter.getLowScores()}]]</p>
+    </div>
+</div>
+</body>
+</html>
