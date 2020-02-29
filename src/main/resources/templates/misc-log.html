@@ -5,6 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
+<p th:text="${sum}"></p>
+<div th:each="scores : ${scoreCounter}">
+    <p th:text="'high scores: ' + ${scores.getHighScores()}"></p>
+    <p th:text="'low scores: ' + ${scores.getLowScores()}"></p>
+</div>
 <p th:text="${test}"></p>
 <div data-th-each="item : ${data}">
     <p data-th-text="${item.id}"></p>

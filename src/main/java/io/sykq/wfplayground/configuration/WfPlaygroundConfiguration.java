@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
-import reactor.core.publisher.ReplayProcessor;
+import reactor.core.publisher.DirectProcessor;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -16,13 +16,21 @@ import reactor.core.publisher.ReplayProcessor;
 public class WfPlaygroundConfiguration implements WebFluxConfigurer {
 
     @Bean
-    public ReplayProcessor<MiscResponse> miscResponsesReplayProcessor() {
-        return ReplayProcessor.create(200);
+    public DirectProcessor<MiscResponse> miscResponsesFluxProcessor() {
+        return DirectProcessor.create();
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void applicationReady() {
-        miscResponsesReplayProcessor().subscribe(next -> log.info("{}", next.getId()));
+        miscResponsesFluxProcessor().subscribe(next -> log.info("{}", next.getId()));
+
+        // count all miscResponse emissions with a score of >= 50 and emit the sum of all responses of this filtered
+        // flux
+        miscResponsesFluxProcessor().filter(miscResponse -> miscResponse.getScore().compareTo(50) >= 0)
+                .map(MiscResponse::getScore)
+                .scan(0, (a, b) -> a + 1)
+                .doOnNext(next -> log.info("reduced to: {}", next))
+                .subscribe();
     }
 }
 

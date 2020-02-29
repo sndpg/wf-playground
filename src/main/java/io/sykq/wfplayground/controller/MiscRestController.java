@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.FluxProcessor;
 import reactor.core.publisher.ReplayProcessor;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("api")
 public class MiscRestController {
 
-    private final ReplayProcessor<MiscResponse> miscResponsesReplayProcessor;
+    private final FluxProcessor<MiscResponse, MiscResponse> miscResponsesFluxProcessor;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, path = "misc")
     public MiscResponse getMisc(@RequestParam MultiValueMap<String, String> requestParams) {
@@ -29,9 +30,11 @@ public class MiscRestController {
         responseValues.put("timestamp", LocalDateTime.now());
         responseValues.putAll(requestParams);
 
-        MiscResponse miscResponse = new MiscResponse().withId(UUID.randomUUID().toString()).withValues(responseValues);
+        MiscResponse miscResponse = new MiscResponse().withId(UUID.randomUUID().toString())
+                .withScore(Integer.parseInt(requestParams.get("score").get(0)))
+                .withValues(responseValues);
 
-        miscResponsesReplayProcessor.onNext(miscResponse);
+        miscResponsesFluxProcessor.onNext(miscResponse);
 
         return miscResponse;
     }
