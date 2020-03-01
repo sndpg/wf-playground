@@ -25,7 +25,8 @@
                 // This is just HTML, so no need to do anything else
                 console.log(event.data);
                 console.log('received something');
-                scoreElement.innerHTML = event.data;
+                // scoreElement.innerHTML = event.data;
+                scoreElement.innerHTML = '';
             });
 
             this.source.onerror = function () {
@@ -39,7 +40,7 @@
         };
     };
 
-    const statusObserver = new StatusObserver().start();
+    //const statusObserver = new StatusObserver().start();
 
     window.onload = function () {
         console.log('onload');

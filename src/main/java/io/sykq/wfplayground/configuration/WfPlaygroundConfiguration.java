@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
-import reactor.core.publisher.DirectProcessor;
+import reactor.core.publisher.FluxProcessor;
+import reactor.core.publisher.ReplayProcessor;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -16,8 +17,8 @@ import reactor.core.publisher.DirectProcessor;
 public class WfPlaygroundConfiguration implements WebFluxConfigurer {
 
     @Bean
-    public DirectProcessor<MiscResponse> miscResponsesFluxProcessor() {
-        return DirectProcessor.create();
+    public FluxProcessor<MiscResponse, MiscResponse> miscResponsesFluxProcessor() {
+        return ReplayProcessor.cacheLast();
     }
 
     @EventListener(ApplicationReadyEvent.class)

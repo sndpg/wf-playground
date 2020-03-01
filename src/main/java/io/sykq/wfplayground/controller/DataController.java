@@ -15,6 +15,7 @@ import reactor.core.publisher.FluxProcessor;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 @Slf4j
 @Controller
@@ -25,7 +26,6 @@ public class DataController {
     private final Flux<ScoreCounter> sumFlux;
     private final Flux<ScoreCounter> scoreStatus;
     private final ScoreCounter scoreCounter = new ScoreCounter();
-
 
     public DataController(FluxProcessor<MiscResponse, MiscResponse> miscResponsesFluxProcessor) {
         this.miscResponsesFluxProcessor = miscResponsesFluxProcessor;
@@ -44,8 +44,11 @@ public class DataController {
 
         scoreStatus =
                 miscResponsesFluxProcessor
+                        .publish(1)
+                        .autoConnect()
                         .map(MiscResponse::getScore)
-                        .scan(new ScoreCounter(), (accumulator, score) -> {
+                        .log("scores", Level.INFO)
+                        .scanWith(ScoreCounter::new, (accumulator, score) -> {
                             if (score.compareTo(50) < 0) {
                                 accumulator.incrementLowScoreCounter();
                             } else {
@@ -53,6 +56,14 @@ public class DataController {
                             }
                             return accumulator;
                         })
+//                        .scan(new ScoreCounter(), (accumulator, score) -> {
+//                            if (score.compareTo(50) < 0) {
+//                                accumulator.incrementLowScoreCounter();
+//                            } else {
+//                                accumulator.incrementHighScoreCounter();
+//                            }
+//                            return accumulator;
+//                        })
                         .doOnNext(next -> log.info("reduced to -> high: {}, low: {}", next.getHighScores(),
                                 next.getLowScores()));
     }
@@ -76,6 +87,11 @@ public class DataController {
         return "misc-log";
     }
 
+    @GetMapping(value = "/simple-status")
+    public String simpleStatus(Model model) {
+        model.addAttribute("scoreCounters", scoreStatus);
+        return "simple-status";
+    }
 
     @GetMapping(value = "/status")
     public String status(Model model) {

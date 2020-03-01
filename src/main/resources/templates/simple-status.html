@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>wf status</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<div id="score">
+    <!--/*@thymesVar id="scoreCounters" type="io.sykq.wfplayground.controller.DataController.ScoreCounter"*/-->
+    <div data-th-each="scoreCounter : ${scoreCounters}">
+        <!--/*@thymesVar id="scoreCounter" type="io.sykq.wfplayground.controller.DataController.ScoreCounter"*/-->
+        <p>[[${scoreCounter.getHighScores()}]]</p>
+        <p>[[${scoreCounter.getLowScores()}]]</p>
+    </div>
+</div>
+</body>
+</html>
