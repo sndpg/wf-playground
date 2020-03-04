@@ -21,7 +21,7 @@ public class WfPlaygroundConfiguration implements WebFluxConfigurer {
         return ReplayProcessor.cacheLast();
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    @EventListener(value = ApplicationReadyEvent.class)
     public void applicationReady() {
         miscResponsesFluxProcessor().subscribe(next -> log.info("{}", next.getId()));
 
